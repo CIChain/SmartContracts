@@ -1,7 +1,7 @@
 pragma solidity ^0.4.18;
 
 
-import "../token/ERC20.sol";
+import "../token/ERCToken.sol";
 
 /**
  * @title TokenTimelock
@@ -116,16 +116,16 @@ contract TokenTimeLock is TransferRecipient{
 
      }
 
-  function receiveTransfer(address _from, uint256 _value, address _token, bytes _extraData) public returns(bool){
+  function tokenFallback(address _from, uint256 _value, bytes _extraData) public returns(bool){
       LockStruct memory lockAttr=convertBytesToLockStruct(_extraData);
       lockAttr.amount=_value;
       lockAttr.startTime=now;
 
-      if(lockTokens[_token][_from].amount>0)
+      if(lockTokens[msg.sender][_from].amount>0)
       {
           revert();
       }
-      lockTokens[_token][_from]=lockAttr;
+      lockTokens[msg.sender][_from]=lockAttr;
       return true;
   }
 
@@ -151,7 +151,7 @@ contract TokenTimeLock is TransferRecipient{
       uint256 installAmount=lock.amount/lock.installment;
       uint256 installDuration=(lock.duration-lock.cliff)/(lock.installment-1);
       uint256 releaseAmount=0;
-      ERC20 token=ERC20(_token);
+      ERCToken token=ERCToken(_token);
       if(duration<lock.cliff)
       {
           return 0;

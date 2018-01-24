@@ -29,6 +29,8 @@ contract Ownable {
     _;
   }
 
-
+  function transferOwnership(address newOwner) onlyOwner public {
+        owner = newOwner;
+  }
 
 }
